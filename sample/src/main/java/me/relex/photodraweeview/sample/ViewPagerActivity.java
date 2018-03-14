@@ -15,7 +15,11 @@ import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.imagepipeline.image.ImageInfo;
+
+import java.util.ArrayList;
+
 import me.relex.circleindicator.CircleIndicator;
+import me.relex.photodraweeview.DraweePagerAdapter;
 import me.relex.photodraweeview.PhotoDraweeView;
 
 public class ViewPagerActivity extends AppCompatActivity {
@@ -34,65 +38,22 @@ public class ViewPagerActivity extends AppCompatActivity {
                         onBackPressed();
                     }
                 });
-
+        String[] mDrawables = new String[] {
+                "https://www.alveo-slovakia.com/photo/147689/w3css-images-bordered-image.jpg",
+                "https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-400502.jpg",
+                "https://images3.alphacoders.com/712/712915.jpg",
+                "https://images8.alphacoders.com/869/869862.jpg",
+                "https://images8.alphacoders121221.com/869/869862.jpg"
+        };
+        ArrayList arrayList = new ArrayList<>();
+        for(int i = 0; i < 5; i++) {
+            arrayList.add(mDrawables[i]);
+        }
         CircleIndicator indicator = (CircleIndicator) findViewById(R.id.indicator);
         MultiTouchViewPager viewPager = (MultiTouchViewPager) findViewById(R.id.view_pager);
-        viewPager.setAdapter(new DraweePagerAdapter("ic_loading"));
+        viewPager.setAdapter(new DraweePagerAdapter(arrayList,"ic_loading",ViewPagerActivity.this));
         indicator.setViewPager(viewPager);
 
     }
 
-    public class DraweePagerAdapter extends PagerAdapter {
-
-        private int[] mDrawables = new int[] {
-                R.drawable.viewpager_1, R.drawable.viewpager_2, R.drawable.viewpager_3
-        };
-        private String errorImage ;
-        public DraweePagerAdapter(String errorImage) {
-            this.errorImage = errorImage;
-        }
-        @Override public int getCount() {
-            return mDrawables.length;
-        }
-
-        @Override public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
-
-        @Override public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
-        }
-
-        @Override public Object instantiateItem(ViewGroup viewGroup, int position) {
-            final PhotoDraweeView photoDraweeView = new PhotoDraweeView(viewGroup.getContext());
-            int resourceId = 0;
-            resourceId = ViewPagerActivity.this.getResources().getIdentifier(this.errorImage, "drawable", ViewPagerActivity.this.getPackageName());
-            if(resourceId != 0) {
-                photoDraweeView.getHierarchy().setFailureImage(getResources().getDrawable(resourceId), ScalingUtils.ScaleType.FIT_CENTER);
-            }
-            PipelineDraweeControllerBuilder controller = Fresco.newDraweeControllerBuilder();
-            controller.setUri(Uri.parse("https://www.alveo-slo213123vakia.com/photo/147689/w3css-images-bordered-image.jpg"));
-            controller.setOldController(photoDraweeView.getController());
-            controller.setControllerListener(new BaseControllerListener<ImageInfo>() {
-                @Override
-                public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-                    super.onFinalImageSet(id, imageInfo, animatable);
-                    if (imageInfo == null) {
-                        return;
-                    }
-                    photoDraweeView.update(imageInfo.getWidth(), imageInfo.getHeight());
-                }
-            });
-            photoDraweeView.setController(controller.build());
-
-            try {
-                viewGroup.addView(photoDraweeView, ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return photoDraweeView;
-        }
-    }
 }
