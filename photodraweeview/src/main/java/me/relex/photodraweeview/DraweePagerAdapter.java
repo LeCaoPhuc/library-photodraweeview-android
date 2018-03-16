@@ -54,7 +54,7 @@ public class DraweePagerAdapter extends PagerAdapter {
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
 
-        FrameLayout.LayoutParams layoutParams =  new FrameLayout.LayoutParams(200, 200);
+        FrameLayout.LayoutParams layoutParams =  new FrameLayout.LayoutParams(100, 100);
         layoutParams.gravity = Gravity.CENTER;
         FrameLayout frameLayout = new FrameLayout(viewGroup.getContext());
         int resourceId = 0;
