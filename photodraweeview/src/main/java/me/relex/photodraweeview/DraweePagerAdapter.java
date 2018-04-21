@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -30,10 +31,14 @@ public class DraweePagerAdapter extends PagerAdapter {
     private ArrayList mDrawables;
     private String imageError;
     private Context mainContext;
-    public DraweePagerAdapter(ArrayList mDrawables, String errorImage, Context context) {
+    private OnPhotoTapListener  onTapPhotoEvent ;
+    private String playIcon;
+    public DraweePagerAdapter(ArrayList<DataViewPager> mDrawables, String errorImage, String playIcon, OnPhotoTapListener onTapPhotoEvent,  Context context) {
         this.mDrawables = mDrawables;
         this.imageError = errorImage;
         this.mainContext = context;
+        this.onTapPhotoEvent = onTapPhotoEvent;
+        this.playIcon = playIcon;
     }
     @Override public int getCount() {
         return mDrawables.size();
@@ -53,8 +58,7 @@ public class DraweePagerAdapter extends PagerAdapter {
         progressBar.setBackgroundColor(Color.argb(1,255,255,255));
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);
-
-        FrameLayout.LayoutParams layoutParams =  new FrameLayout.LayoutParams(200, 200);
+        FrameLayout.LayoutParams layoutParams =  new FrameLayout.LayoutParams(100, 100);
         layoutParams.gravity = Gravity.CENTER;
         FrameLayout frameLayout = new FrameLayout(viewGroup.getContext());
         int resourceId = 0;
@@ -65,8 +69,28 @@ public class DraweePagerAdapter extends PagerAdapter {
         else {
             Log.e("resourceId :" , "not existed with name : " + this.imageError)  ;
         }
+
+        FrameLayout layoutPlayIcon = new FrameLayout(viewGroup.getContext());
+        FrameLayout.LayoutParams layoutParamsPlayIcon =  new FrameLayout.LayoutParams(200,200);
+        layoutParamsPlayIcon.gravity = Gravity.CENTER;
+        ImageView imageView = new ImageView(viewGroup.getContext());
+        int resourceIdPlayIcon = 0;
+        resourceIdPlayIcon = this.mainContext.getResources().getIdentifier(this.playIcon, "drawable", this.mainContext.getPackageName());
+        if(resourceIdPlayIcon != 0) {
+            imageView.setImageResource(resourceIdPlayIcon);
+        }
+        else {
+            Log.e("resourceId :" , "not existed with name : " + this.playIcon)  ;
+        }
+        layoutPlayIcon.addView(imageView,layoutParamsPlayIcon);
+
+
         PipelineDraweeControllerBuilder controller = Fresco.newDraweeControllerBuilder();
-        controller.setUri(Uri.parse((String)mDrawables.get(position)));
+        DataViewPager dataMedia = (DataViewPager)mDrawables.get(position);
+        if(dataMedia != null) {
+            controller.setUri(Uri.parse(((DataViewPager)mDrawables.get(position)).getUrl()));
+        }
+
         controller.setOldController(photoDraweeView.getController());
         controller.setControllerListener(new BaseControllerListener<ImageInfo>() {
             @Override
@@ -86,11 +110,21 @@ public class DraweePagerAdapter extends PagerAdapter {
         });
         photoDraweeView.setVisibility(View.VISIBLE);
         photoDraweeView.setController(controller.build());
+        photoDraweeView.setOnPhotoTapListener(this.onTapPhotoEvent);
+
 
         try {
             frameLayout.addView(progressBar,layoutParams);
+
             frameLayout.addView(photoDraweeView, ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT);
+
+
+            if(dataMedia.getType() == DataViewPager.TypeOfMedia.VIDEO) {
+                frameLayout.addView(layoutPlayIcon,ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT );
+            }
+
             viewGroup.addView(frameLayout, ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT);
         } catch (Exception e) {
@@ -98,4 +132,11 @@ public class DraweePagerAdapter extends PagerAdapter {
         }
         return frameLayout;
     }
+
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        super.setPrimaryItem(container, position, object);
+        Log.i("setPrimaryItem", "position : " + position);
+    }
+
 }
