@@ -1,12 +1,14 @@
 package me.relex.photodraweeview;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +73,8 @@ public class DraweePagerAdapter extends PagerAdapter {
         }
 
         FrameLayout layoutPlayIcon = new FrameLayout(viewGroup.getContext());
-        FrameLayout.LayoutParams layoutParamsPlayIcon =  new FrameLayout.LayoutParams(200,200);
+        int pixel = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,50, this.mainContext.getResources().getDisplayMetrics());
+        FrameLayout.LayoutParams layoutParamsPlayIcon =  new FrameLayout.LayoutParams(pixel,pixel);
         layoutParamsPlayIcon.gravity = Gravity.CENTER;
         ImageView imageView = new ImageView(viewGroup.getContext());
         int resourceIdPlayIcon = 0;
